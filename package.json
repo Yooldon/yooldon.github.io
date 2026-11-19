@@ -1,0 +1,18 @@
+{
+  "name": "yooldon-notes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "个人知识库站点：记录判断，而不是搬运知识",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

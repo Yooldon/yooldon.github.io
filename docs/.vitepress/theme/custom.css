@@ -1,0 +1,74 @@
+/**
+ * 只做「中文排版 + 阅读宽度」这一件事，其余交给默认主题。
+ * 想改颜色，改 :root 里的 --vp-c-brand-* 即可。
+ */
+
+:root {
+  --vp-font-family-base: 'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Source Han Sans SC', 'Noto Sans CJK SC', sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+
+  --vp-c-brand-1: #2563eb;
+  --vp-c-brand-2: #3b82f6;
+  --vp-c-brand-3: #60a5fa;
+
+  --vp-sidebar-width: 272px;
+}
+
+/* 正文：中文行高和阅读宽度 */
+.vp-doc p,
+.vp-doc li {
+  line-height: 1.8;
+}
+
+.vp-doc .content-container {
+  max-width: 760px;
+}
+
+/* 标题：层级靠字重和间距区分，不靠颜色 */
+.vp-doc h2 {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--vp-c-divider);
+  font-weight: 650;
+}
+
+.vp-doc h3 {
+  margin-top: 28px;
+  font-weight: 600;
+}
+
+/* 表格：像文档站那样只留横线，斑马纹读长表更稳 */
+.vp-doc table {
+  display: table;
+  width: 100%;
+  font-size: 14.5px;
+}
+
+.vp-doc tr:nth-child(2n) {
+  background-color: var(--vp-c-bg-soft);
+}
+
+.vp-doc th,
+.vp-doc td {
+  border: 1px solid var(--vp-c-divider);
+  padding: 8px 12px;
+}
+
+/* 行内代码不要抢戏 */
+.vp-doc :not(pre) > code {
+  font-size: 0.875em;
+  padding: 2px 6px;
+}
+
+/* 首页 hero 稍微收一点 */
+.VPHero .name {
+  letter-spacing: -0.02em;
+}
+
+/* 移动端：本页目录折叠按钮 */
+@media (max-width: 960px) {
+  .vp-doc .content-container {
+    max-width: 100%;
+  }
+}

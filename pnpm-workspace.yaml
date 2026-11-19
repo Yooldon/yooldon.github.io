@@ -1,0 +1,10 @@
+# pnpm 11 起，设置项从 .npmrc / package.json 的 pnpm 字段搬到了这里。
+# 见 https://pnpm.io/settings
+
+# 用 npm 式的扁平 node_modules（真实目录 + 硬链接）。
+# 默认的 junction 方式在 Windows + Node 24 下会导致 ESM 解析不到依赖。
+nodeLinker: hoisted
+
+# 允许 esbuild 跑安装脚本（Vite 依赖它）
+allowBuilds:
+  esbuild: true

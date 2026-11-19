@@ -1,0 +1,8 @@
+node_modules/
+.pnpm-store/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+.DS_Store
+*.log
+.vscode/
+.idea/

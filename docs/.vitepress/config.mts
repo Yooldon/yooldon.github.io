@@ -94,12 +94,48 @@ function buildNotesSidebar(): DefaultTheme.SidebarItem[] {
   return groups.sort((a, b) => a.order - b.order).map(({ order: _order, ...rest }) => rest)
 }
 
+/**
+ * 把每个页面的 Markdown 源文件复制进构建产物，
+ * 这样「复制 Markdown / 打开 Markdown」可以直接取同目录的 .md，
+ * 不用连 GitHub，也不怕加速工具改路由。
+ */
+function collectMarkdown(dir: string, base = ''): { rel: string; abs: string }[] {
+  const files: { rel: string; abs: string }[] = []
+
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    // 以点开头的目录/文件（.vitepress 等）不进产物
+    if (entry.name.startsWith('.')) continue
+
+    const rel = base ? `${base}/${entry.name}` : entry.name
+    const abs = path.join(dir, entry.name)
+
+    if (entry.isDirectory()) files.push(...collectMarkdown(abs, rel))
+    else if (entry.name.endsWith('.md')) files.push({ rel, abs })
+  }
+
+  return files
+}
+
+function copyMarkdownSources({ outDir }: { outDir: string }) {
+  for (const file of collectMarkdown(docsDir)) {
+    const raw = fs.readFileSync(file.abs, 'utf8')
+    // 去掉 frontmatter，复制出去的就是干净的正文
+    const body = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '')
+
+    const dest = path.join(outDir, file.rel)
+    fs.mkdirSync(path.dirname(dest), { recursive: true })
+    fs.writeFileSync(dest, body)
+  }
+}
+
 export default defineConfig({
   lang: 'zh-CN',
   title: 'Yooldon 的知识库',
   description: '记录判断，而不是搬运知识。',
   cleanUrls: true,
   lastUpdated: hasGit(),
+
+  buildEnd: copyMarkdownSources,
 
   head: [
     ['meta', { name: 'theme-color', content: '#3b82f6' }],

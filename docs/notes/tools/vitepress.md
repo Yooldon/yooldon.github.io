@@ -99,6 +99,31 @@ themeConfig: {
 `base: '/notes/'`，否则 CSS 和图片全 404。
 :::
 
+## 复制 Markdown 按钮
+
+正文右上角那个「复制 Markdown / 打开 Markdown」，拆开只有三件事：
+
+| 环节 | 做法 | 位置 |
+| --- | --- | --- |
+| 让页面有 `.md` 可取 | 构建结束时把源文件复制进产物，顺手去掉 frontmatter | `config.mts` 的 `buildEnd` |
+| 知道当前页对应哪个文件 | `useData().page.relativePath` | 组件里 |
+| 按钮长在哪 | 覆盖默认 Layout，插进 `#doc-before` 插槽 | `theme/Layout.vue` |
+
+之所以在构建时复制、而不是让浏览器去 GitHub 取原文：一是快，二是这台机器的加速工具会改
+GitHub 的域名解析，直接取大概率失败。
+
+```ts
+// config.mts
+buildEnd: ({ outDir }) => {
+  // docs/**/*.md -> dist/**/*.md（去掉 frontmatter）
+}
+```
+
+::: tip 顺带的好处
+整个站点现在每个页面都有对应的 `.md`，把 URL 后面加 `.md` 就能拿到干净正文，
+直接粘给模型当上下文，比自己复制粘贴靠谱。
+:::
+
 ## 常见坑
 
 | 现象 | 原因 | 处理 |

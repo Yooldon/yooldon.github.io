@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
-    "preview": "vitepress preview docs"
+    "preview": "vitepress preview docs",
+    "ship": "node scripts/ship.mjs",
+    "watch:push": "node scripts/watch-publish.mjs"
   },
   "devDependencies": {
     "vitepress": "^1.6.4"

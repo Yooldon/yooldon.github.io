@@ -28,6 +28,20 @@ python scripts/serve.py 5173 docs/.vitepress/dist
 > （`allowBuilds` 允许 esbuild 跑安装脚本）。在受限沙箱里跑安装会因为禁止起子进程报 `spawn EPERM`，
 > 这不影响构建——esbuild 的平台二进制包已经装上了。
 
+### 本机环境说明（只对这台电脑有效）
+
+- **Git 位置**：`D:\AppSetup\Git\cmd`。装完之后要**新开一个终端**才生效，旧会话的 PATH 里没有它。
+- **TLS**：这台机器的 `hosts` 把 `github.com` 等域名指向了 `127.0.0.1`（Watt Toolkit / SteamTools
+  一类加速工具做的），由它重新签发证书。git 不信任这类证书，所以本仓库单独配了
+  `http.sslCAInfo = .git-ca/github-bundle.pem`（该目录已 gitignore，不会提交）。
+  副作用：**加速工具没开时 git 连不上**，不是仓库坏了。
+- 想撤销这套信任配置：
+
+  ```bash
+  git config --local --unset http.sslCAInfo
+  git config --local --unset http.sslBackend
+  ```
+
 ## 目录结构
 
 ```text

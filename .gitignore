@@ -6,3 +6,7 @@ docs/.vitepress/cache/
 *.log
 .vscode/
 .idea/
+
+# 本机专属：TLS 信任链（见 README「本机环境说明」）
+.git-ca/
+.gh-token.txt

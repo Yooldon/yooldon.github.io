@@ -37,7 +37,13 @@ jobs:
       - name: Build site
         run: pnpm build
 
-      - uses: actions/configure-pages@v5
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        continue-on-error: true
+        with:
+          # 仓库的 Pages 源如果不是「GitHub Actions」，每次 push 会被 Jekyll 的
+          # 分支构建覆盖。这里尝试自动切过去；没有权限时忽略，不阻塞部署。
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:

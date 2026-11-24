@@ -71,10 +71,16 @@
  * 桌面端（≥960）：导航栏加高到 108px，第一行 64px 放 logo 和搜索，
  * 第二行 44px 由 SectionTabs 组件固定渲染在 top:64px 位置。
  * 平板（768–959）：导航栏还是单行，Tab 挤在标题旁边。
+ *
+ * 左边距统一走 --gutter = 72px（约 5 个汉字），
+ * logo、分类栏、左侧目录三者的文字左边缘对齐。
  */
 @media (min-width: 960px) {
   :root {
     --vp-nav-height: 108px;
+    --gutter: 72px;
+    /* 左边距变成 72 之后，272 宽的侧栏放不下分组箭头，加宽一点 */
+    --vp-sidebar-width: 300px;
   }
 
   /* 第一行只占 64px，剩下的高度留给分类栏 */
@@ -82,22 +88,78 @@
   .VPNavBar .content,
   .VPNavBar .content-body,
   .VPNavBar .title {
-    height: 64px;
+    height: 64px !important;
   }
 
-  /* 整条导航用同一块底色，免得滚动时只有右半边有背景 */
+  /*
+   * 整条导航不透明，并且只在底部留一条线。
+   * 主题的 scoped 样式权重和这里相同、但排在后面，所以布局类属性一律 !important。
+   */
   .VPNavBar {
-    background-color: var(--vp-nav-bg-color);
-    border-bottom: 1px solid var(--vp-c-divider);
+    background-color: var(--vp-c-bg) !important;
+    border-bottom: 1px solid var(--vp-c-divider) !important;
   }
 
   .VPNavBar .content-body {
     background-color: transparent !important;
   }
 
-  /* 原来的横向菜单让位给第二行（scoped 样式优先级更高，必须 !important） */
+  /* 第一行的左右留白，和分类栏、侧栏保持一致 */
+  .VPNavBar .wrapper {
+    padding: 0 var(--gutter) !important;
+  }
+
+  .VPNavBar .container {
+    max-width: none !important;
+  }
+
+  /*
+   * 主题在 ≥960 且带侧栏时，会把标题做成绝对定位的浮层（宽度 = 侧栏宽度），
+   * 再用 calc 内边距把 logo 推到侧栏文字的位置。这里让它回到正常流里：
+   * 左边距交给 wrapper 的 --gutter，搜索框自然排在 logo 右侧。
+   */
+  .VPNavBar.has-sidebar .title {
+    position: static !important;
+    width: auto !important;
+    padding: 0 !important;
+  }
+
+  .VPNavBar .content {
+    padding-left: 0 !important;
+  }
+
+  /*
+   * 主题的分隔线是普通流内元素，原来贴在 64px 的导航底边；
+   * 导航加高后它会停在 64px 处，正好把 logo 行和分类行隔开。不要了。
+   */
+  .VPNavBar .divider {
+    display: none !important;
+  }
+
+  /* 原来的横向菜单让位给第二行 */
   .VPNavBar .VPNavBarMenu {
     display: none !important;
+  }
+
+  /*
+   * 侧栏：左边距统一，宽度固定。
+   * ≥1440 时主题会把侧栏撑到半屏并用大留白把文字推到中间，这里覆盖掉。
+   */
+  .VPSidebar {
+    width: var(--vp-sidebar-width) !important;
+    padding-left: var(--gutter) !important;
+    padding-right: 24px !important;
+  }
+
+  /*
+   * 分组用负外边距把悬停高亮铺满整条侧栏，原来 -32 是配合 32 的左边距的。
+   * 左边距改成 72 之后要一起改，否则分组比侧栏宽，右侧箭头会被裁掉。
+   */
+  .VPSidebar .group {
+    margin-left: calc(var(--gutter) * -1) !important;
+    margin-right: -24px !important;
+    padding-left: var(--gutter) !important;
+    padding-right: 24px !important;
   }
 
   /*
@@ -105,7 +167,24 @@
    * 导航现在是不透明的，遮罩已经没必要，直接去掉。
    */
   .VPSidebar .curtain {
-    display: none;
+    display: none !important;
+  }
+
+  /* 正文从侧栏右边缘开始 */
+  .VPContent.has-sidebar {
+    padding-left: var(--vp-sidebar-width) !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  /* 主题在这里用 calc 重新算了侧栏宽度和正文左内边距，覆盖回固定值 */
+  .VPSidebar {
+    width: var(--vp-sidebar-width) !important;
+    padding-left: var(--gutter) !important;
+  }
+
+  .VPContent.has-sidebar {
+    padding-left: var(--vp-sidebar-width) !important;
   }
 }
 

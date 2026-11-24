@@ -67,9 +67,8 @@ function navigate(event: MouseEvent, item: any) {
     align-items: stretch;
     gap: 32px;
     height: 100%;
-    max-width: calc(var(--vp-layout-max-width) - 64px);
-    margin: 0 auto;
-    padding: 0 32px;
+    padding: 0 var(--gutter, 72px);
+    margin: 0;
   }
 
   .section-tabs__link {

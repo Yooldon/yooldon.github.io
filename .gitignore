@@ -12,5 +12,6 @@ docs/.vitepress/cache/
 .gh-token.txt
 
 # 截图验证用的临时产物
-.edge-profile/
+.edge-*/
 .shot-*.png
+.s*.png

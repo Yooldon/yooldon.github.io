@@ -66,8 +66,50 @@
   letter-spacing: -0.02em;
 }
 
-/* ---------- 一级分类：把导航做成文档站那种 Tab ---------- */
-@media (min-width: 768px) {
+/* ---------- 一级分类：桌面端做成两行头部 ---------- */
+/*
+ * 桌面端（≥960）：导航栏加高到 108px，第一行 64px 放 logo 和搜索，
+ * 第二行 44px 由 SectionTabs 组件固定渲染在 top:64px 位置。
+ * 平板（768–959）：导航栏还是单行，Tab 挤在标题旁边。
+ */
+@media (min-width: 960px) {
+  :root {
+    --vp-nav-height: 108px;
+  }
+
+  /* 第一行只占 64px，剩下的高度留给分类栏 */
+  .VPNavBar .container,
+  .VPNavBar .content,
+  .VPNavBar .content-body,
+  .VPNavBar .title {
+    height: 64px;
+  }
+
+  /* 整条导航用同一块底色，免得滚动时只有右半边有背景 */
+  .VPNavBar {
+    background-color: var(--vp-nav-bg-color);
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
+  .VPNavBar .content-body {
+    background-color: transparent !important;
+  }
+
+  /* 原来的横向菜单让位给第二行（scoped 样式优先级更高，必须 !important） */
+  .VPNavBar .VPNavBarMenu {
+    display: none !important;
+  }
+
+  /*
+   * 侧栏顶部的渐隐遮罩按 64px 的导航写死了吸顶偏移，导航加高后会盖住第一项。
+   * 导航现在是不透明的，遮罩已经没必要，直接去掉。
+   */
+  .VPSidebar .curtain {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 959px) {
   /* 菜单从右侧挪到标题旁边，剩下的搜索/外观/图标靠右 */
   .VPNavBarMenu {
     order: -1;
@@ -78,16 +120,12 @@
   .VPNavBarMenuLink {
     height: var(--vp-nav-height);
     padding: 0 2px;
-    margin-right: 28px;
-    font-size: 15px;
+    margin-right: 20px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--vp-c-text-2);
     border-bottom: 2px solid transparent;
     transition: color 0.2s, border-color 0.2s;
-  }
-
-  .VPNavBarMenuLink:last-child {
-    margin-right: 0;
   }
 
   .VPNavBarMenuLink:hover {
@@ -99,14 +137,6 @@
     color: var(--vp-c-brand-1);
     border-bottom-color: var(--vp-c-brand-1);
     font-weight: 600;
-  }
-}
-
-/* 中等宽度放不下五个 Tab 时收紧间距 */
-@media (min-width: 768px) and (max-width: 1180px) {
-  .VPNavBarMenuLink {
-    margin-right: 16px;
-    font-size: 14px;
   }
 }
 

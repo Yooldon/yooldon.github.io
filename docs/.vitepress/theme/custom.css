@@ -81,6 +81,8 @@
     --gutter: 72px;
     /* 左边距变成 72 之后，272 宽的侧栏放不下分组箭头，加宽一点 */
     --vp-sidebar-width: 320px;
+    /* 取消 1440 的版面宽度上限：宽屏下正文两侧不要留空带 */
+    --vp-layout-max-width: 4000px;
   }
 
   /* 第一行只占 64px，剩下的高度留给分类栏 */
@@ -176,11 +178,44 @@
   }
 
   /*
-   * 右侧「本页目录」：让它左侧那条竖线和头部深色模式开关左边的分隔线对齐。
-   * 实测 1280–1920 各宽度下两者固定相差 59px，直接补到左内边距上。
+   * 右侧「本页目录」：让它左边那条竖线正好落在头部深色模式开关左侧的分隔线上。
+   * 实测两者到版面右边缘的距离恒差 158px（1280–2362 都一样），所以把
+   * aside / aside-content / VPDocAside / Outline 四层都收到 158。
    */
   .aside {
-    padding-left: calc(32px + 59px) !important;
+    width: 190px !important;
+    min-width: 190px !important;
+    max-width: 190px !important;
+  }
+
+  .aside-content,
+  .VPDocAside,
+  .VPDocAsideOutline {
+    width: 158px !important;
+    max-width: 158px !important;
+  }
+
+  /* 目录变窄之后长标题会被截成省略号，改成换行显示 */
+  .VPDocAsideOutline .outline-link {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  /* 正文：不再固定宽度居中，铺满「侧栏 → 本页目录」之间的区域 */
+  .VPDoc .container {
+    max-width: none !important;
+    padding-left: 16px !important;
+  }
+
+  /* 正文左侧留白收到约 3 个汉字（侧栏边缘 → 正文） */
+  .VPDoc .content {
+    padding-left: 0 !important;
+  }
+
+  .VPDoc .content-container {
+    max-width: none !important;
+    margin: 0 !important;
   }
 }
 

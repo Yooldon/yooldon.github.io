@@ -8,10 +8,10 @@ hero:
   actions:
     - theme: brand
       text: 开始阅读
-      link: /notes/
+      link: /start/
     - theme: alt
-      text: 笔记结构
-      link: /notes/method/note-structure
+      text: 站点是怎么搭的
+      link: /start/site
 
 features:
   - title: 判例，不是摘录

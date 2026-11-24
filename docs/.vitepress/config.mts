@@ -8,7 +8,6 @@ import { defineConfig, type DefaultTheme } from 'vitepress'
  * 站点根目录（docs/）。配置在 docs/.vitepress/ 里，所以要往上一级。
  */
 const docsDir = fileURLToPath(new URL('..', import.meta.url))
-const notesDir = path.join(docsDir, 'notes')
 
 /**
  * 「最后更新」靠 git log 取时间。机器上没装 git 时（比如纯手写环境）
@@ -43,56 +42,74 @@ function readFrontmatter(file: string): Record<string, string> {
 }
 
 /**
- * 自动生成左侧目录：
- *   docs/notes/<分类>/*.md  ->  一个分类（可折叠分组）
- * 分类名取该目录 index.md 的 title，排序取 order，日期取 date。
- * 新增笔记不需要改配置，只要把 md 丢进目录就行。
+ * 四个一级分区。导航栏那排 Tab、左侧目录、侧栏分区都从这里来。
+ * 顺序按文件夹里的 index.md 的 order 排。
  */
-function buildNotesSidebar(): DefaultTheme.SidebarItem[] {
-  if (!fs.existsSync(notesDir)) return []
+const SECTIONS = ['start', 'knowledge', 'work', 'life']
 
-  const categories = fs
-    .readdirSync(notesDir, { withFileTypes: true })
-    .filter(
-      (entry) =>
-        entry.isDirectory() && !entry.name.startsWith('_') && !entry.name.startsWith('.')
+/** 读一个目录里的页面（不含 index.md），按 order → 日期 → 标题排序 */
+function pagesIn(dir: string, urlBase: string) {
+  if (!fs.existsSync(dir)) return []
+
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md') && entry.name !== 'index.md')
+    .map((entry) => {
+      const slug = entry.name.replace(/\.md$/, '')
+      const fm = readFrontmatter(path.join(dir, entry.name))
+      return {
+        text: fm.title || slug,
+        link: `${urlBase}/${slug}`,
+        order: Number(fm.order ?? 99),
+        date: fm.date || '',
+      }
+    })
+    .sort(
+      (a, b) =>
+        a.order - b.order || b.date.localeCompare(a.date) || a.text.localeCompare(b.text, 'zh')
     )
-
-  const groups = categories.map((entry) => {
-    const dir = entry.name
-    const abs = path.join(notesDir, dir)
-    const meta = readFrontmatter(path.join(abs, 'index.md'))
-
-    const pages = fs
-      .readdirSync(abs, { withFileTypes: true })
-      .filter((f) => f.isFile() && f.name.endsWith('.md') && f.name !== 'index.md')
-      .map((f) => {
-        const slug = f.name.replace(/\.md$/, '')
-        const fm = readFrontmatter(path.join(abs, f.name))
-        return {
-          text: fm.title || slug,
-          link: `/notes/${dir}/${slug}`,
-          order: Number(fm.order ?? 99),
-          date: fm.date || '',
-        }
-      })
-      .sort(
-        (a, b) =>
-          a.order - b.order || b.date.localeCompare(a.date) || a.text.localeCompare(b.text, 'zh')
-      )
-      .map(({ text, link }) => ({ text, link }))
-
-    return {
-      text: meta.title || dir,
-      link: `/notes/${dir}/`,
-      collapsed: false,
-      order: Number(meta.order ?? 99),
-      items: pages,
-    }
-  })
-
-  return groups.sort((a, b) => a.order - b.order).map(({ order: _order, ...rest }) => rest)
+    .map(({ text, link }) => ({ text, link }))
 }
+
+/**
+ * 生成某个分区的左侧目录：
+ *   分区根目录的散页  -> 平铺在前面
+ *   分区下的子目录    -> 一个可折叠分组（组名取子目录 index.md 的 title）
+ * 新增笔记不用改配置，把 md 丢进对应目录就行。
+ */
+function buildSectionSidebar(section: string): DefaultTheme.SidebarItem[] {
+  const abs = path.join(docsDir, section)
+  if (!fs.existsSync(abs)) return []
+
+  // 每一类都给一个回到总览的入口，免得空分区没有侧栏
+  const items: DefaultTheme.SidebarItem[] = [{ text: '总览', link: `/${section}/` }]
+  const groups: (DefaultTheme.SidebarItem & { order: number })[] = []
+
+  for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
+    if (entry.name.startsWith('.')) continue
+
+    if (entry.isDirectory()) {
+      const dirAbs = path.join(abs, entry.name)
+      const meta = readFrontmatter(path.join(dirAbs, 'index.md'))
+      groups.push({
+        text: meta.title || entry.name,
+        link: `/${section}/${entry.name}/`,
+        collapsed: false,
+        items: pagesIn(dirAbs, `/${section}/${entry.name}`),
+        order: Number(meta.order ?? 99),
+      })
+    } else if (entry.name.endsWith('.md') && entry.name !== 'index.md') {
+      const fm = readFrontmatter(path.join(abs, entry.name))
+      items.push({
+        text: fm.title || entry.name,
+        link: `/${section}/${entry.name.replace(/\.md$/, '')}`,
+      })
+    }
+  }
+
+  return [...items, ...groups.sort((a, b) => a.order - b.order).map(({ order: _o, ...g }) => g)]
+}
+
 
 /**
  * 把每个页面的 Markdown 源文件复制进构建产物，
@@ -156,14 +173,20 @@ export default defineConfig({
 
     /* 左上：一级分类（对应文档站那排 Tab） */
     nav: [
-      { text: '笔记', link: '/notes/', activeMatch: '^/notes/' },
-      { text: '方法论', link: '/notes/method/', activeMatch: '^/notes/method/' },
-      { text: '工具', link: '/notes/tools/', activeMatch: '^/notes/tools/' },
+      { text: '快速开始', link: '/start/', activeMatch: '^/start/' },
+      { text: '信息&知识', link: '/knowledge/', activeMatch: '^/knowledge/' },
+      { text: '学习&工作', link: '/work/', activeMatch: '^/work/' },
+      { text: '生活&兴趣', link: '/life/', activeMatch: '^/life/' },
       { text: '关于', link: '/about' },
     ],
 
-    /* 左侧：分类 + 分页（自动生成） */
-    sidebar: buildNotesSidebar(),
+    /* 左侧：每个分区各生成一套目录 */
+    sidebar: {
+      '/start/': buildSectionSidebar('start'),
+      '/knowledge/': buildSectionSidebar('knowledge'),
+      '/work/': buildSectionSidebar('work'),
+      '/life/': buildSectionSidebar('life'),
+    },
 
     /* 右侧：本页目录 */
     outline: {

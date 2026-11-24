@@ -51,16 +51,21 @@ python scripts/serve.py 5173 docs/.vitepress/dist
 │  │  ├─ config.mts        # 全站唯一配置：导航 / 侧栏 / 目录 / 搜索
 │  │  └─ theme/
 │  │     ├─ index.ts       # 继承默认主题
-│  │     └─ custom.css     # 只放中文排版
+│  │     ├─ Layout.vue     # 挂「复制 Markdown」组件
+│  │     └─ custom.css     # 中文排版 + 一级分类 Tab 样式
 │  ├─ index.md             # 首页
 │  ├─ about.md
-│  └─ notes/
-│     ├─ index.md          # 笔记总览
-│     ├─ method/           # 分类：方法论
-│     │  ├─ index.md       # 分类首页（frontmatter 的 title 就是左侧分组名）
-│     │  └─ *.md
-│     ├─ tools/            # 分类：工具
-│     └─ dev/              # 分类：技术
+│  ├─ start/               # 一级分区：快速开始
+│  │  ├─ index.md
+│  │  └─ site.md
+│  ├─ knowledge/           # 一级分区：信息&知识
+│  │  ├─ index.md
+│  │  └─ method/           # 二级分类（组名取这里 index.md 的 title）
+│  ├─ work/                # 一级分区：学习&工作
+│  │  ├─ index.md
+│  │  └─ dev/
+│  └─ life/                # 一级分区：生活&兴趣
+│     └─ index.md
 ├─ templates/note.md       # 新笔记模板
 ├─ .github/workflows/deploy.yml
 └─ pnpm-workspace.yaml
@@ -68,15 +73,19 @@ python scripts/serve.py 5173 docs/.vitepress/dist
 
 ## 加一篇笔记
 
-1. 复制 `templates/note.md` 到 `docs/notes/<分类>/`，文件名用英文 slug。
+1. 复制 `templates/note.md` 到对应分区，比如 `docs/knowledge/method/`，文件名用英文 slug。
 2. 改 frontmatter：`title` 必填；`date`、`order`、`type` 选填。
 3. 写正文：一句话定义 → 对照表 → 坑 → 例子 → 我的判断。
 4. 提交推送，Actions 一分钟后自动上线。
 
-**不用改配置。** 左侧目录由 `config.mts` 里的 `buildNotesSidebar()` 扫描目录生成：
-`docs/notes/<分类>/` 就是一组，分组名取该目录 `index.md` 的 `title`，排序看 `order`，其次按 `date` 倒序。
+**不用改配置。** 左侧目录由 `config.mts` 里的 `buildSectionSidebar()` 扫描目录生成：
+分区根目录的散页平铺在前面，子目录变成一个分组，组名取该目录 `index.md` 的 `title`，
+排序看 `order`，其次按 `date` 倒序。
 
-新建分类也一样：建目录 + 一个 `index.md`（写上 `title` 和 `order`）就自动出现在左侧。
+新增二级分类也一样：建目录 + 一个 `index.md`（写上 `title` 和 `order`）就自动出现在左侧。
+
+想加第五个一级分区，改三处：建 `docs/<section>/`、在 `config.mts` 的 `SECTIONS` 里加名字、
+在 `nav` 里加一项。
 
 ## 三栏是怎么来的
 

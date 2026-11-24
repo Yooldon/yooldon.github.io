@@ -57,14 +57,17 @@ status: settled
 
 ```ts
 themeConfig: {
-  // 左上：一级分类
+  // 左上：一级分类（四个分区）
   nav: [
-    { text: '笔记', link: '/notes/', activeMatch: '^/notes/' },
-    { text: '方法论', link: '/notes/method/' },
+    { text: '快速开始', link: '/start/', activeMatch: '^/start/' },
+    { text: '信息&知识', link: '/knowledge/', activeMatch: '^/knowledge/' },
   ],
 
-  // 左侧：分页目录（本项目自动扫描 docs/notes 生成）
-  sidebar: buildNotesSidebar(),
+  // 左侧：每个分区各生成一套目录
+  sidebar: {
+    '/start/': buildSectionSidebar('start'),
+    '/knowledge/': buildSectionSidebar('knowledge'),
+  },
 
   // 右侧：本页目录，只收 H2/H3
   outline: { level: [2, 3], label: '本页目录' },
@@ -77,7 +80,7 @@ themeConfig: {
 
 四步，都不需要改配置：
 
-1. 在 `docs/notes/method/` 下新建 `my-note.md`。
+1. 在对应分区下新建文件，例如 `docs/knowledge/method/my-note.md`。
 2. 写 frontmatter：`title` 必填，`date`、`order`、`type` 选填。
 3. 写正文：一句话定义 → 表格 → 坑 → 例子 → 我的判断。
 4. `git add . && git commit -m "note: my-note" && git push`，等一分钟自动上线。
@@ -129,6 +132,6 @@ buildEnd: ({ outDir }) => {
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
 | 本地正常、线上白屏 | 缺 `base` | 项目站必须设 `base: '/仓库名/'` |
-| 链接带 `.html` 打不开 | `cleanUrls: true` 下路径不带后缀 | 链接写 `/notes/dev/x`，不要写 `x.md` |
+| 链接带 `.html` 打不开 | `cleanUrls: true` 下路径不带后缀 | 链接写 `/knowledge/method/x`，不要写 `x.md` |
 | 中文搜不到 | 本地搜索按空格分词 | 标题里用完整词，或用 Algolia DocSearch |
 | 侧栏分组顺序乱 | `order` 写成字符串 | `order` 必须是数字 |

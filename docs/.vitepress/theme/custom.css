@@ -66,6 +66,50 @@
   letter-spacing: -0.02em;
 }
 
+/* ---------- 一级分类：把导航做成文档站那种 Tab ---------- */
+@media (min-width: 768px) {
+  /* 菜单从右侧挪到标题旁边，剩下的搜索/外观/图标靠右 */
+  .VPNavBarMenu {
+    order: -1;
+    margin-right: auto;
+    margin-left: 8px;
+  }
+
+  .VPNavBarMenuLink {
+    height: var(--vp-nav-height);
+    padding: 0 2px;
+    margin-right: 28px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--vp-c-text-2);
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .VPNavBarMenuLink:last-child {
+    margin-right: 0;
+  }
+
+  .VPNavBarMenuLink:hover {
+    color: var(--vp-c-text-1);
+    border-bottom-color: var(--vp-c-divider);
+  }
+
+  .VPNavBarMenuLink.active {
+    color: var(--vp-c-brand-1);
+    border-bottom-color: var(--vp-c-brand-1);
+    font-weight: 600;
+  }
+}
+
+/* 中等宽度放不下五个 Tab 时收紧间距 */
+@media (min-width: 768px) and (max-width: 1180px) {
+  .VPNavBarMenuLink {
+    margin-right: 16px;
+    font-size: 14px;
+  }
+}
+
 /* 移动端：本页目录折叠按钮 */
 @media (max-width: 960px) {
   .vp-doc .content-container {

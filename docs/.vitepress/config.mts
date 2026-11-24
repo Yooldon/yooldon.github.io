@@ -84,6 +84,7 @@ function buildSectionSidebar(section: string): DefaultTheme.SidebarItem[] {
   // 每一类都给一个回到总览的入口，免得空分区没有侧栏
   const items: DefaultTheme.SidebarItem[] = [{ text: '总览', link: `/${section}/` }]
   const groups: (DefaultTheme.SidebarItem & { order: number })[] = []
+  const loose: { text: string; link: string; order: number; date: string }[] = []
 
   for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
     if (entry.name.startsWith('.')) continue
@@ -100,12 +101,24 @@ function buildSectionSidebar(section: string): DefaultTheme.SidebarItem[] {
       })
     } else if (entry.name.endsWith('.md') && entry.name !== 'index.md') {
       const fm = readFrontmatter(path.join(abs, entry.name))
-      items.push({
+      loose.push({
         text: fm.title || entry.name,
         link: `/${section}/${entry.name.replace(/\.md$/, '')}`,
+        order: Number(fm.order ?? 99),
+        date: fm.date || '',
       })
     }
   }
+
+  // 分区根目录的散页也按 order 排，和分组里的页面保持一致
+  items.push(
+    ...loose
+      .sort(
+        (a, b) =>
+          a.order - b.order || b.date.localeCompare(a.date) || a.text.localeCompare(b.text, 'zh')
+      )
+      .map(({ text, link }) => ({ text, link }))
+  )
 
   return [...items, ...groups.sort((a, b) => a.order - b.order).map(({ order: _o, ...g }) => g)]
 }
@@ -177,7 +190,6 @@ export default defineConfig({
       { text: '信息&知识', link: '/knowledge/', activeMatch: '^/knowledge/' },
       { text: '学习&工作', link: '/work/', activeMatch: '^/work/' },
       { text: '生活&兴趣', link: '/life/', activeMatch: '^/life/' },
-      { text: '关于', link: '/about' },
     ],
 
     /* 左侧：每个分区各生成一套目录 */

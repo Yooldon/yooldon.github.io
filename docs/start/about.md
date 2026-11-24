@@ -1,9 +1,9 @@
 ---
-title: 关于
-order: 99
+title: 关于本站
+order: 3
 ---
 
-# 关于
+# 关于本站
 
 这是 Yooldon 的个人知识库，用 [VitePress](https://vitepress.dev/) 构建，托管在 GitHub Pages。
 

@@ -80,7 +80,7 @@
     --vp-nav-height: 108px;
     --gutter: 72px;
     /* 左边距变成 72 之后，272 宽的侧栏放不下分组箭头，加宽一点 */
-    --vp-sidebar-width: 300px;
+    --vp-sidebar-width: 320px;
   }
 
   /* 第一行只占 64px，剩下的高度留给分类栏 */
@@ -173,6 +173,14 @@
   /* 正文从侧栏右边缘开始 */
   .VPContent.has-sidebar {
     padding-left: var(--vp-sidebar-width) !important;
+  }
+
+  /*
+   * 右侧「本页目录」：让它左侧那条竖线和头部深色模式开关左边的分隔线对齐。
+   * 实测 1280–1920 各宽度下两者固定相差 59px，直接补到左内边距上。
+   */
+  .aside {
+    padding-left: calc(32px + 59px) !important;
   }
 }
 

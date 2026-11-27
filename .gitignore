@@ -16,3 +16,4 @@ docs/.vitepress/cache/
 .shot-*.png
 .s*.png
 .final*.png
+.[a-z]*.png

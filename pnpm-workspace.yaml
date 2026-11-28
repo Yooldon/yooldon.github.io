@@ -8,3 +8,8 @@ nodeLinker: hoisted
 # 允许 esbuild 跑安装脚本（Vite 依赖它）
 allowBuilds:
   esbuild: true
+
+# 不要在每次 pnpm dev / build 之前自动跑 install。
+# 依赖是别的 pnpm 版本装的，自动检查会想删掉 node_modules 重装，
+# 在没有交互终端时直接失败。需要装依赖时手动 pnpm install。
+verifyDepsBeforeRun: false
